@@ -3,9 +3,10 @@
 /lib/
 /dist/
 /docs/
-/shell_commands/
 .idea/*
 
 .DS_Store
 coverage
 *.log
+
+node_modules

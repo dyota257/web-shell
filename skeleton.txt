@@ -1,0 +1,2 @@
+https://www.metachris.com/2021/04/starting-a-typescript-project-in-2021/
+https://levelup.gitconnected.com/typescript-nodemon-the-ultimate-setup-7200aa60cc8b

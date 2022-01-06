@@ -1,0 +1,8 @@
+secret
+dcf7Q~oqX8faCSzJ57mFMVzKLsSl4vQmMUFoZ
+
+app name
+Graph Node.js Quickstart
+
+app ID
+65b44e4d-2cd2-4090-bdfe-27a2fc8d2289
