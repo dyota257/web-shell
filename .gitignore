@@ -1,7 +1,8 @@
 /node_modules/
 /build/
 /lib/
-/dist/
+/dist/**/*.js
+/dist/**/*.js.*
 /docs/
 .idea/*
 

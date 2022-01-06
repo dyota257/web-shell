@@ -1,4 +1,6 @@
 import express from 'express';
+import { tt } from './programs/tt/tt';
+import { help } from './programs/help/help';
 
 const app = express();
 
@@ -40,35 +42,26 @@ app.post('/command', (req, res) => {
 
     switch (program) {
         case 'tt':
-            // @ts-ignore
-            out = `This is tt, and the commands are ${commands}`;
+            out = tt(commands);
             break;
-        case 'htmx':
-            window.location.href = '/htmx';
+        case 'help':
+            out = help();
             break;
         default:
             out = 'I do not know what that is';
             break;
     }
 
-    console.log('received');
-    console.log(req.headers);
-    console.log(req.body);
-
     // send this body to the API
 
     res.send(out);
-
-    console.log(res)
 });
 
 /* 
-
     tt start
     tt stop
     tt note
     tt log
-
 */
 
 // @ts-ignore
@@ -81,25 +74,3 @@ app.listen(port, () => {
     // tslint:disable-next-line:no-console
     console.log(`server started at http://localhost:${port}`);
 });
-
-// @ts-ignore
-function processInput(input: string): string {
-    // input: string
-    // return string
-    let program = input.split(' ')[0];
-    // @ts-ignore
-    let commands = input.split(' ').slice(1).join(' ');
-    let out: string = '';
-    switch (program) {
-        case 'tt':
-            out = 'tt';
-            break;
-        case 'htmx':
-            window.location.href = '/htmx';
-            break;
-        default:
-            out = 'I do not know what that is';
-            break;
-    }
-    return `# ` + out;
-}
