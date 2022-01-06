@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake terminal</title>
+
+    <style>
+        :root {
+            --output-color: chartreuse;
+            --input-color: gold;
+            --font-size: 20px;
+        }
+
+        body {
+            background-color: black;
+            color: var(--output-color);
+            font-family: 'Consolas', monospace;
+            font-size: var(--font-size);
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        #prompt {
+            background: none;
+            border: none;
+            color: var(--input-color);
+            font-family: 'Consolas', monospace;
+            font-size: var(--font-size);
+            outline: none;
+        }
+
+        .input {
+            color: var(--input-color);
+        }
+    </style>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script src="/util/processing.js"></script>
+</head>
+
+<body>
+
+    <div id="history">
+        <span id="startMessage">
+            TerminAlfred
+        </span>
+    </div>
+
+    <div>
+        > <input autofocus type="text" class="input" id="prompt" style="width:90%;" name="prompt">
+    </div>
+
+    <script>
+        let prompt = $$('prompt');
+        let history = $$('history');
+
+        let ttsheet = []; // Array<Entry>
+        /*
+            type Entry {
+                name: string,
+                start: string,
+                notes: Array<string>,
+                end: string
+            }
+        */
+
+        displayPrompt();
+        prompt.value = ''
+
+        document.addEventListener('keydown', () => {
+            if (event.key == 'Enter' && prompt == document.activeElement) {
+                submitInput(prompt.value)
+                // clear the textbox
+                prompt.value = '';
+                displayPrompt()
+            };
+        });
+
+        document.addEventListener('click', () => { $$('prompt').focus(); });
+
+        function $(selector) { return document.querySelectorAll(selector) };
+        function $$(selector) { return document.getElementById(selector) };
+
+        async function submitInput(input) {
+            // input: string
+            // return void
+
+            if (input == 'cls') {
+                clearConsole()
+            } else {
+                printToConsole(input);
+                history.innerHTML += processInput(input)
+            };
+
+        }
+
+        function printToConsole(input) {
+            // input: string
+            // return void
+            history.innerHTML += `<div><span class="output">> </span><span class="input">${input}</span></div>`
+        }
+
+        function displayPrompt() {
+            // return void
+            history.innerHTML += `<div>
+                <div>[${getCurrentTime()}]</div><br>
+                </div>`
+            // <span class="prompt">What can I do for you?</span>
+        }
+
+        function clearConsole() {
+            // return void
+            history.innerHTML = ''
+        }
+
+        function tt(commands) {
+            let command = commands.split(' ')[0];
+            let args = commands.split(' ').slice(1);
+            let out = '';
+
+            if (command.length == 0) {
+                out = `You should include a command`;
+            } else {
+                switch (command.toLowerCase()) {
+                    case 'start':
+                        let project = args[0];
+                        if (project == undefined) {
+                            out = `You have to set a project`;
+                        } else {
+                            out = `Started ${project} at ${getCurrentTime()}`;
+                            ttsheet.push({
+                                name: project,
+                                start: new Date().toISOString(),
+                                notes: [],
+                                end: ''
+                            });
+                        }
+                        break;
+                    case 'log':
+                        console.log('log');
+                        out = JSON.stringify(ttsheet);
+                        break;
+                    default:
+                        out = `I don't know what that is`;
+                }
+            }
+
+            return 'tt: ' + out;
+        }
+        
+        function processInput(input) {
+            // input: string
+            // return string
+            let program = input.split(' ')[0];
+            let commands = input.split(' ').slice(1).join(' ');
+            let out = '';
+
+            switch (program) {
+                case 'tt':
+                    // @ts-ignore
+                    out = tt(commands);
+                    break;
+                case 'htmx':
+                    window.location.href = '/htmx';
+                    break;
+                default:
+                    out = 'I do not know what that is';
+                    break;
+            }
+            return `<div class='output'># ${out}</div>`;
+        }
+
+        function getCurrentTime() {
+            let today = new Date;
+            return today.getHours().toString().padStart(2, '0') + ':' + today.getMinutes().toString().padStart(2, '0')
+        }
+
+    </script>
+</body>
+
+</html>

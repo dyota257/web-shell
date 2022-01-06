@@ -32,13 +32,34 @@ app.get('/htmx', (_req, res) => {
 });
 
 app.post('/command', (req, res) => {
+    // input: string
+    // return string
+    let program = req.body.command.split(' ')[0];
+    let commands = req.body.command.split(' ').slice(1).join(' ');
+    let out: string = '';
+
+    switch (program) {
+        case 'tt':
+            // @ts-ignore
+            out = `This is tt, and the commands are ${commands}`;
+            break;
+        case 'htmx':
+            window.location.href = '/htmx';
+            break;
+        default:
+            out = 'I do not know what that is';
+            break;
+    }
+
     console.log('received');
     console.log(req.headers);
     console.log(req.body);
 
     // send this body to the API
 
-    res.send('ok');
+    res.send(out);
+
+    console.log(res)
 });
 
 /* 
