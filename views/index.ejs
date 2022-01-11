@@ -7,7 +7,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fake terminal</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="js/shared/functions.js"></script>
+    <!-- <style>
+        :root {
+            --output-color: chartreuse;
+            --input-color: gold;
+            --font-size: 20px;
+        }
+
+        body {
+            background-color: black;
+            color: var(--output-color);
+            font-family: 'Consolas', monospace;
+            font-size: var(--font-size);
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        #prompt {
+            background: none;
+            border: none;
+            color: var(--input-color);
+            font-family: 'Consolas', monospace;
+            font-size: var(--font-size);
+            outline: none;
+        }
+
+        .input {
+            color: var(--input-color);
+        }
+    </style> -->
 </head>
 
 <body>
@@ -25,25 +54,20 @@
     <script>
         let prompt = $$('prompt');
         let history = $$('history');
-        let terminalHistory = []; // Array<string>
+
         let ttsheet = []; // Array<Entry>
 
         displayPrompt();
         prompt.value = ''
 
-        document.addEventListener('keydown', async () => {
-            if (event.key == 'Enter' && prompt == document.activeElement && prompt.value.length !== 0) {
-                terminalHistory.push(prompt.value);
-                await submitInput(prompt.value);
+        document.addEventListener('keydown', () => {
+            if (event.key == 'Enter' && prompt == document.activeElement) {
+                submitInput(prompt.value)
                 // clear the textbox
                 prompt.value = '';
-                displayPrompt();
+                displayPrompt()
             };
         });
-
-        // terminal history
-        // ArrowUp
-        // ArrowDown
 
         document.addEventListener('click', () => { $$('prompt').focus(); });
 
@@ -57,6 +81,8 @@
             if (input == 'cls') {
                 clearConsole()
             } else {
+
+
                 printToConsole(input);
                 history.innerHTML += await processInput(input)
             };
@@ -90,6 +116,8 @@
             history.innerHTML += `<div><span class="output">> </span><span class="input">${input}</span></div>`
         }
 
+
+
         function displayPrompt() {
             // return void
             history.innerHTML += `<div>
@@ -101,6 +129,16 @@
         function clearConsole() {
             // return void
             history.innerHTML = ''
+        }
+
+
+        function getCurrentTime() {
+            let today = new Date();
+            return (
+                today.getHours().toString().padStart(2, '0') +
+                ':' +
+                today.getMinutes().toString().padStart(2, '0')
+            );
         }
 
 

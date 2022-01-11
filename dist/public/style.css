@@ -1,0 +1,28 @@
+:root {
+    --output-color: chartreuse;
+    --input-color: gold;
+    --font-size: 20px;
+}
+
+body {
+    background-color: black;
+    color: var(--output-color);
+    font-family: 'Consolas', monospace;
+    font-size: var(--font-size);
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+#prompt {
+    background: none;
+    border: none;
+    color: var(--input-color);
+    font-family: 'Consolas', monospace;
+    font-size: var(--font-size);
+    outline: none;
+}
+
+.input {
+    color: var(--input-color);
+}

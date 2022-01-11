@@ -9,19 +9,12 @@ const port = 8000;
 app.use(express.json());
 app.use(express.urlencoded());
 
-app.use(express.static('public'));
+// app.use(express.static('public'));
+// app.use(express.static('../public'));
+app.use(express.static('dist/public'));
 
-const // @ts-ignore
-    root = 'https://api.jsonbin.io/v3',
-    masterKey = '$2b$10$ZnO6WtBQRdK7T2XnA.SJFupmACGAApO62k3tMTc/AJTanAdJet4ye',
-    collectionId = '61d596f839a33573b3237f90';
+app.set('view engine', 'ejs');
 
-// @ts-ignore
-let reqHeader = {
-    'Content-Type': 'application/json',
-    'X-Master-Key': masterKey,
-    'X-Collection-Id': collectionId,
-};
 
 // ROUTES
 
@@ -33,7 +26,7 @@ app.get('/htmx', (_req, res) => {
     res.sendFile(__dirname + '/htmx.html');
 });
 
-app.post('/command', (req, res) => {
+app.post('/command', async (req, res) => {
     // input: string
     // return string
     let program = req.body.command.split(' ')[0];
@@ -42,7 +35,7 @@ app.post('/command', (req, res) => {
 
     switch (program) {
         case 'tt':
-            out = tt(commands);
+            out = await tt(commands);
             break;
         case 'help':
             out = help();
@@ -56,13 +49,6 @@ app.post('/command', (req, res) => {
 
     res.send(out);
 });
-
-/* 
-    tt start
-    tt stop
-    tt note
-    tt log
-*/
 
 // @ts-ignore
 app.post('/htmx', (req, res) => {

@@ -1,1 +1,5 @@
 [ ] convert processing to server side
+[ ] implement terminal history feature (up arrow down arrow)
+[ ] start tests
+[ ] fix up node-fetch (can't handle non-ESM, but typescript compiles to require if ES5)
+[ ] figure out how to use http
