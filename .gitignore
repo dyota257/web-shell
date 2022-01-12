@@ -3,7 +3,10 @@
 /lib/
 /dist/**/*.js
 /dist/**/*.js.*
+/dist/**/*.ts
+/dist/**/*.ts.*
 /docs/
+.vscode/*
 .idea/*
 
 .DS_Store
