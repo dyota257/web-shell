@@ -1,22 +1,13 @@
-import { Entry, APIMethods, APIOptions } from './types';
+import { Entry } from './types';
+import { makeAPIOptions, makeAPICall, collectionId } from './jsonbin';
 import { getCurrentTime } from '../../public/js/shared/functions';
-// @ts-ignore
-import axios, { AxiosRequestConfig } from 'axios';
+
 /* 
     tt start
     tt stop
     tt note
     tt log
 */
-export const root = 'https://api.jsonbin.io/v3',
-    masterKey = '$2b$10$ZnO6WtBQRdK7T2XnA.SJFupmACGAApO62k3tMTc/AJTanAdJet4ye',
-    collectionId = '61d596f839a33573b3237f90';
-
-// @ts-ignore
-export let reqHeader = {
-    'Content-Type': 'application/json',
-    'X-Master-Key': masterKey,
-};
 
 export async function tt(commands: string): Promise<string> {
     let command = commands.split(' ')[0];
@@ -31,6 +22,9 @@ export async function tt(commands: string): Promise<string> {
         out = `You should include a command`;
     } else {
         switch (command.toLowerCase()) {
+            case 'status':
+                out = await ttStatus();
+                break;
             case 'start':
                 out = await ttStart(args);
                 break;
@@ -79,7 +73,7 @@ async function ttStart(args: Array<string>): Promise<string> {
 
             console.log({ response });
 
-            if (response === 'OK') {
+            if (response.statusText === 'OK') {
                 return `Started ${project} ${
                     args[1] !== undefined ? 'now' : 'at ' + getCurrentTime()
                 }`;
@@ -87,99 +81,9 @@ async function ttStart(args: Array<string>): Promise<string> {
                 return 'Something went wrong server-side.';
             }
         } else {
-            return 'The target URL was empty.'
+            return 'The target URL was empty.';
         }
     }
-}
-
-export const apiMethods = {
-    binsCreate: {
-        // @ts-ignore
-        route: (binId?: string) => '/b',
-        method: 'POST',
-        headers: (collectionId?: string) => {
-            return { 'X-Collection-Id': collectionId };
-        },
-    },
-    binsRead: {
-        route: (binId?: string) => `/b/${binId}`,
-        method: 'GET',
-        headers: () => {
-            return {};
-        },
-    },
-    binsUpdate: {
-        route: (binId?: string) => `/b/${binId}`,
-        method: 'PUT',
-        headers: () => {
-            return {};
-        },
-    },
-    binsDelete: {
-        route: (binId?: string) => `/b/${binId}`,
-        method: 'DELETE',
-        headers: () => {
-            return {};
-        },
-    },
-    collectionsBins: {
-        route: (collectionId?: string) => `/c/${collectionId}/bins`,
-        method: 'GET',
-        headers: () => {
-            return {};
-        },
-    },
-};
-
-export function makeAPIOptions(
-    action: APIMethods,
-    entry?: Entry,
-    binId?: string
-) {
-    // @ts-ignore
-    let target = root + apiMethods[action].route(binId);
-
-    let options: APIOptions = {
-        method: apiMethods[action].method,
-        url: target,
-        headers: {
-            ...reqHeader,
-            ...apiMethods[action].headers(collectionId),
-        },
-    };
-
-    if (entry !== undefined) {
-        options = {
-            ...options,
-            data: entry,
-        };
-    }
-
-    return options;
-}
-
-async function makeAPICall(options: APIOptions): Promise<string> {
-    console.log(options);
-
-    try {
-        const response = await axios(<AxiosRequestConfig>options);
-        return response.statusText;
-    } catch (err) {
-        console.log(err);
-        return 'Error - something went wrong with Axios'
-    }
-    
-    // @ts-ignore
-    
-    // axios(options)
-    //     .then(function (response) {
-    //         console.log(response.statusText);
-    //         return response.statusText;
-    //     })
-    //     .catch(function (error) {
-    //         console.log(error);
-    //         return error;
-    //     });
 }
 
 function ttLog(): string {
@@ -198,4 +102,28 @@ function ttNote(args: Array<string>): string {
     } else {
         return `Made a note for ${project}: '${getCurrentTime()} note note note'`;
     }
+}
+
+async function ttStatus(): Promise<string> {
+    // open up collection with collection ID
+    // this will be the first 10 bins
+
+    const bins = (
+        await makeAPICall(
+            makeAPIOptions('collectionsBins', undefined, collectionId)
+        )
+    ).data;
+    const latestBinId: string = bins[0].record;
+    console.log(latestBinId);
+
+    const response = await makeAPICall(
+        makeAPIOptions('binsRead', undefined, latestBinId)
+    );
+    const latestBin = response.data.record;
+    console.log({ latestBin }); 
+
+    // get the first item (that should be the latest)
+    // read off the data, the name of the project
+    // if there are any notes, display them
+    return `Last working on ${latestBin.name}, started at ${latestBin.start}`;
 }

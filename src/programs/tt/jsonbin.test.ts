@@ -4,7 +4,7 @@ import {
     apiMethods,
     makeAPIOptions,
     masterKey,
-} from './tt';
+} from './jsonbin';
 import { Entry, APIOptions, APIMethods } from './types';
 
 const binId = '61d7f57339a33573b324bf17';

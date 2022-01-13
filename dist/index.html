@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake terminal</title>
+    <title>d-orbital shell</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="js/shared/functions.js"></script>
 </head>
@@ -13,9 +13,7 @@
 <body>
 
     <div id="history">
-        <span id="startMessage">
-            TerminAlfred
-        </span>
+        <span id="startMessage"> # d-orbital # </span>
     </div>
 
     <div>
@@ -73,7 +71,6 @@
                 body: JSON.stringify({ command: input })
             });
 
-
             if (response.ok) { // if HTTP-status is 200-299
                 return `<div class='output'># ${await response.text()}</div>`;
 
@@ -82,7 +79,6 @@
             }
 
         }
-
 
         function printToConsole(input) {
             // input: string
@@ -95,7 +91,6 @@
             history.innerHTML += `<div>
                 <div>[${getCurrentTime()}]</div><br>
                 </div>`
-            // <span class="prompt">What can I do for you?</span>
         }
 
         function clearConsole() {
