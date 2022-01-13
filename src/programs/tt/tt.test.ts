@@ -5,65 +5,68 @@ import {
     makeAPIOptions,
     masterKey,
 } from './tt';
-import { Entry, APIOptions } from './types';
-// let collectionId = '61d596f839a33573b3237f90';
-let binId = '61d7f57339a33573b324bf17';
-// let reqHeader = {
-//     'Content-Type': 'application/json',
-//     'X-Master-Key': masterKey,
-// };
+import { Entry, APIOptions, APIMethods } from './types';
+
+const binId = '61d7f57339a33573b324bf17';
+
+const actions: Array<APIMethods> = [
+    'binsCreate',
+    'binsRead',
+    'binsUpdate',
+    'binsDelete',
+    'collectionsBins',
+];
+
+const routes: Array<string | undefined> = [
+    undefined,
+    binId,
+    binId,
+    binId,
+    collectionId,
+];
+
+const answers: Array<string> = [
+    '/b',
+    '/b/61d7f57339a33573b324bf17',
+    '/b/61d7f57339a33573b324bf17',
+    '/b/61d7f57339a33573b324bf17',
+    '/c/61d596f839a33573b3237f90/bins',
+];
+
+const methods: Array<string> = ['POST', 'GET', 'PUT', 'DELETE', 'GET'];
+
+const headers = [
+    {
+        'Content-Type': 'application/json',
+        'X-Collection-Id': '61d596f839a33573b3237f90',
+        'X-Master-Key':
+            '$2b$10$ZnO6WtBQRdK7T2XnA.SJFupmACGAApO62k3tMTc/AJTanAdJet4ye',
+    },
+    reqHeader,
+    reqHeader,
+    reqHeader,
+    reqHeader,
+];
 
 describe('the apiMethods object', () => {
-    it('makes the right routes', () => {
-        expect(apiMethods['binsCreate'].route(undefined)).toEqual('/b');
-        expect(apiMethods['binsRead'].route(binId)).toEqual(
-            '/b/61d7f57339a33573b324bf17'
-        );
-        expect(apiMethods['binsUpdate'].route(binId)).toEqual(
-            '/b/61d7f57339a33573b324bf17'
-        );
-        expect(apiMethods['binsDelete'].route(binId)).toEqual(
-            '/b/61d7f57339a33573b324bf17'
-        );
-        expect(apiMethods['collectionsBins'].route(collectionId)).toEqual(
-            '/c/61d596f839a33573b3237f90/bins'
-        );
-    });
-
-    it('uses the right methods', () => {
-        expect(apiMethods['binsCreate'].method).toEqual('POST');
-        expect(apiMethods['binsRead'].method).toEqual('GET');
-        expect(apiMethods['binsUpdate'].method).toEqual('PUT');
-        expect(apiMethods['binsDelete'].method).toEqual('DELETE');
-        expect(apiMethods['collectionsBins'].method).toEqual('GET');
-    });
-
-    it('makes the right headers', () => {
-        expect({
-            ...reqHeader,
-            ...apiMethods['binsCreate'].headers(collectionId),
-        }).toMatchObject({
-            'Content-Type': 'application/json',
-            'X-Collection-Id': '61d596f839a33573b3237f90',
-            'X-Master-Key':
-                '$2b$10$ZnO6WtBQRdK7T2XnA.SJFupmACGAApO62k3tMTc/AJTanAdJet4ye',
+    actions.forEach((e: APIMethods, i: number) => {
+        it('makes the right routes', () => {
+            expect(apiMethods[e].route(routes[i])).toEqual(answers[i]);
         });
-        expect({
-            ...reqHeader,
-            ...apiMethods['binsRead'].headers(),
-        }).toMatchObject(reqHeader);
-        expect({
-            ...reqHeader,
-            ...apiMethods['binsUpdate'].headers(),
-        }).toMatchObject(reqHeader);
-        expect({
-            ...reqHeader,
-            ...apiMethods['binsDelete'].headers(),
-        }).toMatchObject(reqHeader);
-        expect({
-            ...reqHeader,
-            ...apiMethods['collectionsBins'].headers(),
-        }).toMatchObject(reqHeader);
+    
+        it('uses the right methods', () => {
+            expect(apiMethods[e].method).toEqual(methods[i]);
+        });
+    
+        it('makes the right headers', () => {
+            let headersArg: string | undefined;
+            e === 'binsCreate' ? (headersArg = collectionId) : false;
+
+            expect({
+                ...reqHeader,
+                ...apiMethods[e].headers(headersArg),
+            }).toMatchObject(headers[i]);
+        });
     });
 });
 

@@ -1,9 +1,11 @@
 export function getCurrentTime(): string {
     let today = new Date();
     // sets a timezone offset of +8
-    let offset = 8;
+    const offset = 8;
+    const browserOffset = today.getTimezoneOffset()/60 // -8 on the browser, 0 on the server
+
     return formatTime(
-        wrapMidnight(today.getHours(), offset),
+        wrapMidnight(today.getHours() + browserOffset, offset),
         today.getMinutes()
     );
 }

@@ -97,33 +97,33 @@ export const apiMethods = {
         // @ts-ignore
         route: (binId?: string) => '/b',
         method: 'POST',
-        headers: (collectionId: string) => {
+        headers: (collectionId?: string) => {
             return { 'X-Collection-Id': collectionId };
         },
     },
     binsRead: {
-        route: (binId: string) => `/b/${binId}`,
+        route: (binId?: string) => `/b/${binId}`,
         method: 'GET',
         headers: () => {
             return {};
         },
     },
     binsUpdate: {
-        route: (binId: string) => `/b/${binId}`,
+        route: (binId?: string) => `/b/${binId}`,
         method: 'PUT',
         headers: () => {
             return {};
         },
     },
     binsDelete: {
-        route: (binId: string) => `/b/${binId}`,
+        route: (binId?: string) => `/b/${binId}`,
         method: 'DELETE',
         headers: () => {
             return {};
         },
     },
     collectionsBins: {
-        route: (collectionId: string) => `/c/${collectionId}/bins`,
+        route: (collectionId?: string) => `/c/${collectionId}/bins`,
         method: 'GET',
         headers: () => {
             return {};
