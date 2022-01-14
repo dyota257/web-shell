@@ -32,9 +32,9 @@
         document.addEventListener('keydown', async () => {
             if (event.key == 'Enter' && prompt == document.activeElement && prompt.value.length !== 0) {
                 terminalHistory.push(prompt.value);
-                await submitInput(prompt.value);
                 // clear the textbox
                 prompt.value = '';
+                await submitInput(prompt.value);
                 displayPrompt();
             };
         });

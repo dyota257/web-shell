@@ -1,6 +1,16 @@
 import { Entry } from './types';
-import { makeAPIOptions, makeAPICall, collectionId } from './jsonbin';
-import { getCurrentTime } from '../../public/js/shared/functions';
+import {
+    makeAPIOptions,
+    makeAPICall,
+    getLatestBin,
+    getLatestBinId,
+    getBin,
+} from './jsonbin';
+import {
+    getCurrentTime,
+    convertDateToString,
+} from '../../public/js/shared/functions';
+import { format as date_format, parseISO } from 'date-fns';
 
 /* 
     tt start
@@ -29,7 +39,7 @@ export async function tt(commands: string): Promise<string> {
                 out = await ttStart(args);
                 break;
             case 'stop':
-                out = ttStop();
+                out = await ttStop();
                 break;
             case 'note':
                 out = ttNote(args);
@@ -51,6 +61,8 @@ async function ttStart(args: Array<string>): Promise<string> {
 
     let time: string = '';
 
+    // TODO this is wrong - args[1] needs to be an ISO string
+    // TODO also need validation on args[1]
     args[1] !== undefined
         ? (time = args[1])
         : (time = new Date().toISOString());
@@ -90,9 +102,24 @@ function ttLog(): string {
     return 'The whole history is here';
 }
 
-function ttStop(): string {
-    let project = 'current project';
-    return `Stopped ${project} at ${getCurrentTime()}`;
+async function ttStop(): Promise<string> {
+
+    // TODO handle time argument
+    
+    const latestBinId = await getLatestBinId();
+    const latestBin: Entry = await getBin(latestBinId);
+
+    if (latestBin.hasOwnProperty('end')) {
+        return `The project ${latestBin.name} already ended ${onTimeAtDate(
+            <string>latestBin.end
+        )}`;
+    } else {
+        latestBin.end = new Date().toISOString();
+        makeAPICall(
+            makeAPIOptions('binsUpdate', latestBin, latestBinId)
+        );
+        return `Stopped ${latestBin.name} at ${getCurrentTime()}`;
+    }
 }
 
 function ttNote(args: Array<string>): string {
@@ -108,22 +135,17 @@ async function ttStatus(): Promise<string> {
     // open up collection with collection ID
     // this will be the first 10 bins
 
-    const bins = (
-        await makeAPICall(
-            makeAPIOptions('collectionsBins', undefined, collectionId)
-        )
-    ).data;
-    const latestBinId: string = bins[0].record;
-    console.log(latestBinId);
+    const latestBin = await getLatestBin();
 
-    const response = await makeAPICall(
-        makeAPIOptions('binsRead', undefined, latestBinId)
-    );
-    const latestBin = response.data.record;
-    console.log({ latestBin }); 
+    return `Last working on ${latestBin.name}, started ${onTimeAtDate(
+        latestBin.start
+    )}`;
+}
 
-    // get the first item (that should be the latest)
-    // read off the data, the name of the project
-    // if there are any notes, display them
-    return `Last working on ${latestBin.name}, started at ${latestBin.start}`;
+function onTimeAtDate(dateISOString: string): string {
+    const date = parseISO(dateISOString);
+    return `at ${convertDateToString(date)} on ${date_format(
+        date,
+        'eeee, do MMM, yyyy'
+    )}`;
 }

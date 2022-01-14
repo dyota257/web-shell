@@ -1,13 +1,9 @@
 export function getCurrentTime(): string {
     let today = new Date();
     // sets a timezone offset of +8
-    const offset = 8;
-    const browserOffset = today.getTimezoneOffset()/60 // -8 on the browser, 0 on the server
 
-    return formatTime(
-        wrapMidnight(today.getHours() + browserOffset, offset),
-        today.getMinutes()
-    );
+    return convertDateToString(today);
+
 }
 
 export function formatTime(hours: number, minutes: number): string {
@@ -30,4 +26,15 @@ export function wrapMidnight(hour: number, offset: number): number {
 
 function twoDigits(number: number): string {
     return number.toString().padStart(2, '0');
+}
+
+export function convertDateToString(thisDate: Date) {
+
+    const offset = 8;
+    const browserOffset = thisDate.getTimezoneOffset()/60 // -8 on the browser, 0 on the server
+
+    return formatTime(
+        wrapMidnight(thisDate.getHours() + browserOffset, offset),
+        thisDate.getMinutes()
+    );
 }

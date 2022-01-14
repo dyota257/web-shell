@@ -122,7 +122,9 @@ export function makeAPIOptions(
     return options;
 }
 
-export async function makeAPICall(options: APIOptions): Promise<AxiosResponse<any, any>> {
+export async function makeAPICall(
+    options: APIOptions
+): Promise<AxiosResponse<any, any>> {
     console.log(options);
 
     try {
@@ -133,4 +135,35 @@ export async function makeAPICall(options: APIOptions): Promise<AxiosResponse<an
         // @ts-ignore
         return 'Error - something went wrong with Axios';
     }
+}
+
+export async function getLatestBin(): Promise<Entry> {
+    const latestBinId = await getLatestBinId();
+    const latestBin = await getBin(latestBinId);
+
+    return latestBin;
+}
+
+export async function getLatestBinId(): Promise<string> {
+    const bins = (
+        await makeAPICall(
+            makeAPIOptions('collectionsBins', undefined, collectionId)
+        )
+    ).data;
+    return bins[0].record;
+}
+
+export async function getBin(binId: string): Promise<Entry> {
+    const response = await makeAPICall(
+        makeAPIOptions('binsRead', undefined, binId)
+    );
+
+    return response.data.record;
+}
+
+export async function updateBin(entry: Entry, binId: string): Promise<Entry> {
+    const response = await makeAPICall(
+        makeAPIOptions('binsUpdate', entry, binId)
+    );
+    return response.data.record;
 }
