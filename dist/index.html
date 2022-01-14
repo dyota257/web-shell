@@ -33,8 +33,6 @@
             if (event.key == 'Enter' && prompt == document.activeElement && prompt.value.length !== 0) {
                 terminalHistory.push(prompt.value);
                 await submitInput(prompt.value);
-                // clear the textbox
-                prompt.value = '';
                 displayPrompt();
             };
         });
@@ -56,6 +54,8 @@
                 clearConsole()
             } else {
                 printToConsole(input);
+                // clear the textbox
+                prompt.value = '';
                 history.innerHTML += await processInput(input)
             };
 
