@@ -196,3 +196,10 @@ export function addNoteToEntry(oldEntry: Entry, newNote: string): Entry {
     }
 }
 
+export function validateTimeInput(inputTime:string):boolean {
+    // take in input of a format 20:34 or 2034
+    // always two digits hours, always two digits minutes. 
+    return true
+
+
+}

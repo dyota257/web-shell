@@ -1,4 +1,4 @@
-import { addNoteToEntry } from './tt';
+import { addNoteToEntry, validateTimeInput } from './tt';
 
 describe('addNoteToEntry function', () => {
     const newNote = 'This is a new note';
@@ -63,6 +63,24 @@ describe('addNoteToEntry function', () => {
     it('updates entries correctly', () => {
         oldEntries.forEach((e, i) => {
             expect(addNoteToEntry(e, newNote)).toMatchObject(newEntries[i]);
+        });
+    });
+});
+
+describe('checkTimeInput is allowing the right types of time input', () => {
+    it('', () => {
+        const tests: Array<[string, boolean]> = [
+            ['01:30', true],
+            ['0137', true],
+            ['112', false],
+            ['12', false],
+            ['1260', false],
+        ];
+
+        tests.forEach((e) => {
+            const question: string = e[0];
+            const answer: boolean = e[1];
+            expect(validateTimeInput(question)).toBe(answer);
         });
     });
 });
