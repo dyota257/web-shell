@@ -5,6 +5,7 @@ import {
     getLatestBin,
     getLatestBinId,
     getBin,
+    updateBin,
 } from './jsonbin';
 import {
     getCurrentTime,
@@ -42,7 +43,7 @@ export async function tt(commands: string): Promise<string> {
                 out = await ttStop();
                 break;
             case 'note':
-                out = ttNote(args);
+                out = await ttNote(args);
                 break;
             case 'log':
                 out = ttLog();
@@ -103,9 +104,8 @@ function ttLog(): string {
 }
 
 async function ttStop(): Promise<string> {
-
     // TODO handle time argument
-    
+
     const latestBinId = await getLatestBinId();
     const latestBin: Entry = await getBin(latestBinId);
 
@@ -115,31 +115,57 @@ async function ttStop(): Promise<string> {
         )}`;
     } else {
         latestBin.end = new Date().toISOString();
-        makeAPICall(
-            makeAPIOptions('binsUpdate', latestBin, latestBinId)
-        );
+        makeAPICall(makeAPIOptions('binsUpdate', latestBin, latestBinId));
         return `Stopped ${latestBin.name} at ${getCurrentTime()}`;
     }
 }
 
-function ttNote(args: Array<string>): string {
-    let project = 'current project';
-    if (args.length === 0) {
-        return `You cannot have an empty note`;
+async function ttNote(args: Array<string>): Promise<string> {
+    // is the latest task an open one?
+
+    const { latestBinId, latestBin } = await getLatestBin();
+
+    // if not, then bail
+
+    if (latestBin.hasOwnProperty('end') || false) {
+        return `You're not working on a task. Start one to add a note to it.`;
     } else {
-        return `Made a note for ${project}: '${getCurrentTime()} note note note'`;
+        // add note
+        const newNote = args.join(' ') || '';
+
+        if (args.length === 0 || newNote.length === 0) {
+            console.log(newNote.length);
+            return `You cannot have an empty note`;
+        } else {
+            const newBin = addNoteToEntry(latestBin, newNote);
+            // update bin
+            await updateBin(newBin, latestBinId);
+
+            // respond to user
+            return `Note added to ${
+                latestBin.name
+            }: '${getCurrentTime()} ${newNote}'`;
+        }
     }
 }
+
 
 async function ttStatus(): Promise<string> {
     // open up collection with collection ID
     // this will be the first 10 bins
 
-    const latestBin = await getLatestBin();
+    const { latestBin } = await getLatestBin();
+    console.log({ latestBin });
 
-    return `Last working on ${latestBin.name}, started ${onTimeAtDate(
-        latestBin.start
-    )}`;
+    if (latestBin.hasOwnProperty('end')) {
+        return `Last working on ${latestBin.name}, ended ${onTimeAtDate(
+            latestBin.end!
+        )}`;
+    } else {
+        return `Still working on ${latestBin.name}, started ${onTimeAtDate(
+            latestBin.start
+        )}`;
+    }
 }
 
 function onTimeAtDate(dateISOString: string): string {
@@ -149,3 +175,24 @@ function onTimeAtDate(dateISOString: string): string {
         'eeee, do MMM, yyyy'
     )}`;
 }
+
+export function addNoteToEntry(oldEntry: Entry, newNote: string): Entry {
+    if (oldEntry.hasOwnProperty('end')) {
+        return oldEntry;
+    } else {
+        const oldSetOfNotes = oldEntry.notes;
+        let newSetOfNotes: Array<string>;
+        if (oldSetOfNotes === undefined) {
+            newSetOfNotes = [newNote];
+        } else {
+            newSetOfNotes = [...oldSetOfNotes, newNote];
+        }
+
+        const newEntry = {
+            ...oldEntry,
+            notes: newSetOfNotes,
+        };
+        return newEntry;
+    }
+}
+

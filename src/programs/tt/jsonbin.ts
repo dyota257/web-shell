@@ -139,11 +139,11 @@ export async function makeAPICall(
     }
 }
 
-export async function getLatestBin(): Promise<Entry> {
+export async function getLatestBin(): Promise<{latestBinId: string, latestBin:Entry}> {
     const latestBinId = await getLatestBinId();
     const latestBin = await getBin(latestBinId);
 
-    return latestBin;
+    return { latestBinId, latestBin };
 }
 
 export async function getLatestBinId(): Promise<string> {
