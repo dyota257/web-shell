@@ -11,7 +11,11 @@ import {
     getCurrentTime,
     convertDateToString,
 } from '../../public/js/shared/functions';
-import { format as date_format, parseISO } from 'date-fns';
+import {
+    format as date_format,
+    parseISO,
+    isMatch as date_isMatch,
+} from 'date-fns';
 
 /* 
     tt start
@@ -149,7 +153,6 @@ async function ttNote(args: Array<string>): Promise<string> {
     }
 }
 
-
 async function ttStatus(): Promise<string> {
     // open up collection with collection ID
     // this will be the first 10 bins
@@ -196,10 +199,11 @@ export function addNoteToEntry(oldEntry: Entry, newNote: string): Entry {
     }
 }
 
-export function validateTimeInput(inputTime:string):boolean {
+export function validateTimeInput(inputTime: string): boolean {
     // take in input of a format 20:34 or 2034
-    // always two digits hours, always two digits minutes. 
-    return true
-
-
+    // always two digits hours, always two digits minutes.
+    return (
+        [4, 5].includes(inputTime.length) &&
+        (date_isMatch(inputTime, 'kk:mm') || date_isMatch(inputTime, 'kkmm'))
+    );
 }
