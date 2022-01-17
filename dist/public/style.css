@@ -14,7 +14,7 @@ body {
     width: 50%;
 }
 
-#prompt {
+#userInput {
     background: none;
     border: none;
     color: var(--input-color);

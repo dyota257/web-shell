@@ -1,10 +1,12 @@
 import express from 'express';
 import { tt } from './programs/tt/tt';
 import { help } from './programs/help/help';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
-const port = 8000;
+// const port = 8000;
 
 app.use(express.json());
 app.use(express.urlencoded());
@@ -14,7 +16,6 @@ app.use(express.urlencoded());
 app.use(express.static('dist/public'));
 
 app.set('view engine', 'ejs');
-
 
 // ROUTES
 
@@ -56,7 +57,8 @@ app.post('/htmx', (req, res) => {
 });
 
 // start the express server
-app.listen(process.env.PORT || port, () => {
+const port = process.env.PORT;
+app.listen(port, () => {
     // tslint:disable-next-line:no-console
     console.log(`server started at http://localhost:${port}`);
 });

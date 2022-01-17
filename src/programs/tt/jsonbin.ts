@@ -1,9 +1,11 @@
 import { Entry, APIMethods, APIOptions } from './types';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const root = 'https://api.jsonbin.io/v3',
-    masterKey = '$2b$10$ZnO6WtBQRdK7T2XnA.SJFupmACGAApO62k3tMTc/AJTanAdJet4ye',
-    collectionId = '61d596f839a33573b3237f90';
+    masterKey: string = <string>process.env.MASTER_KEY,
+    collectionId: string = <string>process.env.COLLECTION_ID;
 
 // @ts-ignore
 export let reqHeader = {

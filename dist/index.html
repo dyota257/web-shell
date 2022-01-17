@@ -17,31 +17,60 @@
     </div>
 
     <div>
-        > <input autofocus type="text" class="input" id="prompt" style="width:90%;" name="prompt">
+        <span id="prompt"></span> <input autofocus type="text" class="input" id="userInput" style="width:90%;" name="userInput">
     </div>
 
     <script>
-        let prompt = $$('prompt');
-        let history = $$('history');
-        let terminalHistory = []; // Array<string>
-        let ttsheet = []; // Array<Entry>
+        let userInput = $$('userInput'),
+            history = $$('history'),
+            terminalHistory = [], // Array<string>
+            terminalIndex = 0,
+            ttsheet = [] // Array<Entry>
+            prompt = `> `
+            shellResponsePrompt = `# `
 
+        $$('prompt').innerText = prompt;
         displayPrompt();
-        prompt.value = ''
 
         document.addEventListener('keydown', async () => {
-            if (event.key == 'Enter' && prompt == document.activeElement && prompt.value.length !== 0) {
-                terminalHistory.push(prompt.value);
-                await submitInput(prompt.value);
-                displayPrompt();
-            };
+            switch (event.key) {
+                case 'Enter':
+                    if (userInput == document.activeElement && userInput.value.length !== 0) {
+                        terminalHistory.push(userInput.value);
+                        terminalIndex = terminalHistory.length;
+                        console.log(terminalHistory);
+                        await submitInput(userInput.value);
+                        displayPrompt();
+                    };
+                    break;
+                case 'ArrowUp':
+                    if (userInput == document.activeElement) {
+                        if (terminalIndex > 0) {
+                            terminalIndex--
+                            userInput.value = terminalHistory[terminalIndex];
+                        }
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (userInput == document.activeElement) {
+                        if (terminalIndex < terminalHistory.length) {
+                            terminalIndex++
+                            if (terminalHistory[terminalIndex] == undefined) {
+                                userInput.value = ''
+                            } else {
+                                userInput.value = terminalHistory[terminalIndex];
+                            }
+                        }
+                    }
+                    break;
+            }
         });
 
         // terminal history
         // ArrowUp
         // ArrowDown
 
-        document.addEventListener('click', () => { $$('prompt').focus(); });
+        document.addEventListener('click', () => { $$('userInput').focus(); });
 
         function $(selector) { return document.querySelectorAll(selector) };
         function $$(selector) { return document.getElementById(selector) };
@@ -55,7 +84,7 @@
             } else {
                 printToConsole(input);
                 // clear the textbox
-                prompt.value = '';
+                userInput.value = '';
                 history.innerHTML += await processInput(input)
             };
 
@@ -72,10 +101,10 @@
             });
 
             if (response.ok) { // if HTTP-status is 200-299
-                return `<div class='output'># ${await response.text()}</div>`;
+                return printShellResponse(await response.text())
 
             } else {
-                alert("HTTP-Error: " + response.status);
+                return printShellResponse('Network error')
             }
 
         }
@@ -83,7 +112,12 @@
         function printToConsole(input) {
             // input: string
             // return void
-            history.innerHTML += `<div><span class="output">> </span><span class="input">${input}</span></div>`
+            history.innerHTML += `
+                <div>
+                    <span class="output">${prompt}</span>
+                    <span class="input">${input}</span>
+                </div>
+            `
         }
 
         function displayPrompt() {
@@ -97,6 +131,12 @@
             // return void
             history.innerHTML = ''
         }
+
+        function printShellResponse(output) {
+            return `<div class='output'>${shellResponsePrompt}${output}</div>`;
+        }
+
+        
 
 
     </script>
