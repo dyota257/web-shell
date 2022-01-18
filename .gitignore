@@ -13,3 +13,5 @@
 coverage
 *.log
 .env
+
+/src/scratch.ts

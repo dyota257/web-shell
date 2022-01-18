@@ -1,8 +1,11 @@
 import {
-    addNoteToEntry ,
     validateTimeInput,
-} from './tt';
+    convertInputTimeToHoursMinutes,
+} from './tt-time';
 
+import {
+    addNoteToEntry,
+} from './tt';
 describe('addNoteToEntry function', () => {
     const newNote = 'This is a new note';
 
@@ -95,5 +98,28 @@ describe('validateTimeInput is allowing the right types of time input', () => {
                 [question]: answer,
             });
         });
+    });
+});
+
+describe('convertInputTimeToHoursMinutes', () => {
+    it('returns the right hours and minutes', () => {
+        const tests = [
+            ['2045', { hours: 20, minutes: 45 }],
+            ['20:45', { hours: 20, minutes: 45 }],
+        ];
+
+        tests.forEach((e) => {
+            expect(convertInputTimeToHoursMinutes(<string>e[0])).toMatchObject(
+                e[1]
+            );
+        });
+    });
+});
+
+describe('makeISOFromTime', () =>{
+    it('', () => {
+        const tests = [
+            [new Date(2022, 1, 18, 11, 30), '2022-01-18T10:33:11.663Z']
+        ]
     });
 });

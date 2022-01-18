@@ -7,15 +7,10 @@ import {
     getBin,
     updateBin,
 } from './jsonbin';
-import {
-    getCurrentTime,
-    convertDateToString,
-} from '../../public/js/shared/functions';
-import {
-    format as date_format,
-    parseISO,
-    isMatch as date_isMatch,
-} from 'date-fns';
+
+import { getCurrentTime } from '../../public/js/shared/functions';
+
+import { onTimeAtDate, setHoursAndMinutes, validateTimeInput } from './tt-time';
 
 /* 
     tt start
@@ -60,17 +55,20 @@ export async function tt(commands: string): Promise<string> {
     return 'tt: ' + out;
 }
 
-async function ttStart(args: Array<string>): Promise<string> {
+export async function ttStart(args: Array<string>): Promise<string> {
     let project = args[0];
-    console.log({ project });
 
     let time: string = '';
 
-    // TODO this is wrong - args[1] needs to be an ISO string
-    // TODO also need validation on args[1]
-    args[1] !== undefined
-        ? (time = args[1])
-        : (time = new Date().toISOString());
+    if (args[1]) {
+        if (validateTimeInput(args[1])) {
+            time = setHoursAndMinutes(args[1]);
+        } else {
+            return 'This time input is invalid';
+        }
+    } else {
+        time = new Date().toISOString();
+    }
 
     if (project == undefined || project.length === 0) {
         return `You have to set a project`;
@@ -84,16 +82,13 @@ async function ttStart(args: Array<string>): Promise<string> {
 
         let options = makeAPIOptions('binsCreate', newEntry);
 
-        console.log({ options });
         if (options.url.length !== 0) {
             let response = await makeAPICall(options);
 
             console.log({ response });
 
             if (response.statusText === 'OK') {
-                return `Started ${project} ${
-                    args[1] !== undefined ? 'now' : 'at ' + getCurrentTime()
-                }`;
+                return `Started ${project} at ${args[1] || getCurrentTime()}`;
             } else {
                 return 'Something went wrong server-side.';
             }
@@ -171,14 +166,6 @@ async function ttStatus(): Promise<string> {
     }
 }
 
-function onTimeAtDate(dateISOString: string): string {
-    const date = parseISO(dateISOString);
-    return `at ${convertDateToString(date)} on ${date_format(
-        date,
-        'eeee, do MMM, yyyy'
-    )}`;
-}
-
 export function addNoteToEntry(oldEntry: Entry, newNote: string): Entry {
     if (oldEntry.hasOwnProperty('end')) {
         return oldEntry;
@@ -197,13 +184,4 @@ export function addNoteToEntry(oldEntry: Entry, newNote: string): Entry {
         };
         return newEntry;
     }
-}
-
-export function validateTimeInput(inputTime: string): boolean {
-    // take in input of a format 20:34 or 2034
-    // always two digits hours, always two digits minutes.
-    return (
-        [4, 5].includes(inputTime.length) &&
-        (date_isMatch(inputTime, 'kk:mm') || date_isMatch(inputTime, 'kkmm'))
-    );
 }
