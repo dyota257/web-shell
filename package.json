@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"start": "nodemon dist/main.js",
+		"start": "tsc nodemon dist/main.js",
 		"cli": "ts-node src/cli.ts",
 		"test": "jest",
 		"lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
