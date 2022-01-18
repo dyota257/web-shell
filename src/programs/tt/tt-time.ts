@@ -19,7 +19,13 @@ export function onTimeAtDate(dateISOString: string): string {
 export function setHoursAndMinutes(inputTime: string): string {
     if (validateTimeInput(inputTime)) {
         const { hours, minutes } = convertInputTimeToHoursMinutes(inputTime);
-        let outputDate = setMinutes(setHours(new Date(), hours), minutes);
+
+        const offset = (new Date).getTimezoneOffset() / 60 // -8 on the browser, 0 on the server
+        
+        let outputDate = setMinutes(
+            setHours(new Date(), hours - offset - 8), 
+            minutes
+        );
         return outputDate.toISOString();
     } else {
         return `This is not a valid time input`;

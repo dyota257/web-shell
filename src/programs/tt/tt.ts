@@ -87,7 +87,10 @@ export async function ttStart(args: Array<string>): Promise<string> {
 
             console.log({ response });
 
-            if (response.statusText === 'OK') {
+            if (
+                // true
+                response.statusText === 'OK'
+            ) {
                 return `Started ${project} at ${args[1] || getCurrentTime()}`;
             } else {
                 return 'Something went wrong server-side.';
