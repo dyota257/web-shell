@@ -14,7 +14,7 @@ body {
     width: 50%;
 }
 
-#userInput {
+input[type=text] {
     background: none;
     border: none;
     color: var(--input-color);

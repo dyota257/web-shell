@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>d-orbital shell</title>
+    <title>D Terminal</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="js/shared/functions.js"></script>
 </head>
@@ -13,21 +13,22 @@
 <body>
 
     <div id="history">
-        <span id="startMessage"> # d-orbital # </span>
+        <span id="startMessage">Session started</span>
+        <br>
     </div>
 
     <div>
-        <span id="prompt"></span> <input autofocus type="text" class="input" id="userInput" style="width:90%;" name="userInput">
+        <span id="prompt"></span> <input autofocus type="text" class="input" id="promptInput" style="width:90%;">
     </div>
 
     <script>
-        let userInput = $$('userInput'),
+        let userInput = $$('promptInput'),
             history = $$('history'),
             terminalHistory = [], // Array<string>
             terminalIndex = 0,
             ttsheet = [] // Array<Entry>
-            prompt = `> `
-            shellResponsePrompt = `# `
+        prompt = `> `
+        shellResponsePrompt = `# `
 
         $$('prompt').innerText = prompt;
         displayPrompt();
@@ -38,7 +39,7 @@
                     if (userInput == document.activeElement && userInput.value.length !== 0) {
                         terminalHistory.push(userInput.value);
                         terminalIndex = terminalHistory.length;
-                        console.log(terminalHistory);
+                        console.log({ terminalHistory });
                         await submitInput(userInput.value);
                         displayPrompt();
                     };
@@ -66,11 +67,7 @@
             }
         });
 
-        // terminal history
-        // ArrowUp
-        // ArrowDown
-
-        document.addEventListener('click', () => { $$('userInput').focus(); });
+        document.addEventListener('click', () => { userInput.focus(); });
 
         function $(selector) { return document.querySelectorAll(selector) };
         function $$(selector) { return document.getElementById(selector) };
@@ -79,15 +76,22 @@
             // input: string
             // return void
 
-            if (input == 'cls') {
-                clearConsole()
-            } else {
-                printToConsole(input);
-                // clear the textbox
-                userInput.value = '';
-                history.innerHTML += await processInput(input)
-            };
+            switch (input) {
+                case 'cls':
+                    clearConsole();
+                    break;
+                case 'tt download':
+                    console.log('download');
+                    await ttDownload(input);
+                    printToConsole(input);
+                    break;
+                default:
+                    printToConsole(input);
+                    // clear the textbox
+                    userInput.value = '';
+                    history.innerHTML += await processInput(input)
 
+            }
         }
 
         async function processInput(input) {
@@ -107,6 +111,20 @@
                 return printShellResponse('Network error')
             }
 
+        }
+
+        async function ttDownload(input) {
+            let response = await fetch('/command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ command: input })
+            });
+
+            console.log({response: await response.text()});
+            
+            downloadObjectAsJson(await response.text(), '.tt-sheet');
         }
 
         function printToConsole(input) {
@@ -136,7 +154,16 @@
             return `<div class='output'>${shellResponsePrompt}${output}</div>`;
         }
 
-        
+        function downloadObjectAsJson(dataString, exportName) {
+            var downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute('href', dataString);
+            downloadAnchorNode.setAttribute('download', exportName + '.json');
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+
 
 
     </script>

@@ -139,7 +139,10 @@ export async function makeAPICall(
     }
 }
 
-export async function getLatestBin(): Promise<{latestBinId: string, latestBin:Entry}> {
+export async function getLatestBin(): Promise<{
+    latestBinId: string;
+    latestBin: Entry;
+}> {
     const latestBinId = await getLatestBinId();
     const latestBin = await getBin(latestBinId);
 
@@ -147,11 +150,7 @@ export async function getLatestBin(): Promise<{latestBinId: string, latestBin:En
 }
 
 export async function getLatestBinId(): Promise<string> {
-    const bins = (
-        await makeAPICall(
-            makeAPIOptions('collectionsBins', undefined, collectionId)
-        )
-    ).data;
+    const bins = await getLast10();
     return bins[0].record;
 }
 
@@ -168,4 +167,12 @@ export async function updateBin(entry: Entry, binId: string): Promise<Entry> {
         makeAPIOptions('binsUpdate', entry, binId)
     );
     return response.data.record;
+}
+
+export async function getLast10() {
+    return (
+        await makeAPICall(
+            makeAPIOptions('collectionsBins', undefined, collectionId)
+        )
+    ).data;
 }

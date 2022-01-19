@@ -3,21 +3,13 @@ import {
     makeAPIOptions,
     makeAPICall,
     getLatestBin,
-    getLatestBinId,
-    getBin,
     updateBin,
+    getLast10,
 } from './jsonbin';
 
 import { getCurrentTime } from '../../public/js/shared/functions';
 
 import { onTimeAtDate, setHoursAndMinutes, validateTimeInput } from './tt-time';
-
-/* 
-    tt start
-    tt stop
-    tt note
-    tt log
-*/
 
 export async function tt(commands: string): Promise<string> {
     let command = commands.split(' ')[0];
@@ -46,6 +38,9 @@ export async function tt(commands: string): Promise<string> {
                 break;
             case 'log':
                 out = ttLog();
+                break;
+            case 'download':
+                return ttDownload();
                 break;
             default:
                 out = `I don't know what that is`;
@@ -110,8 +105,7 @@ async function ttStop(args: Array<string>): Promise<string> {
 
     let time: string;
 
-    const latestBinId = await getLatestBinId();
-    const latestBin: Entry = await getBin(latestBinId);
+    const { latestBinId, latestBin } = await getLatestBin();
 
     if (latestBin.hasOwnProperty('end')) {
         return `The project ${latestBin.name} already ended ${onTimeAtDate(
@@ -198,4 +192,56 @@ export function addNoteToEntry(oldEntry: Entry, newNote: string): Entry {
         };
         return newEntry;
     }
+}
+
+export async function ttDownload(): Promise<string> {
+    // var testObject = [
+    //     {
+    //         name: 'from-the-server',
+    //         start: '2022-01-19T09:17:26.519Z',
+    //         notes: [
+    //             'change annamaria to yusi soryako',
+    //             'need to change sessions annamaria',
+    //         ],
+    //         end: '2022-01-19T09:28:04.068Z',
+    //     },
+    //     {
+    //         name: 'operations-assurance',
+    //         start: '2022-01-19T07:57:04.790Z',
+    //         notes: [
+    //             'do change requests passed on from Heidi',
+    //             'swap over tony drake-brockman',
+    //         ],
+    //         end: '2022-01-19T09:01:14.776Z',
+    //     },
+    //     {
+    //         name: 'operations-assurance',
+    //         start: '2022-01-19T06:13:06.477Z',
+    //         notes: [
+    //             'make hot to guide on updating monthly asset integrity meeting slides',
+    //         ],
+    //         end: '2022-01-19T07:41:36.701Z',
+    //     },
+    //     {
+    //         name: 'consolidate-notes',
+    //         start: '2022-01-19T02:44:03.551Z',
+    //         end: '2022-01-19T06:12:48.914Z',
+    //     },
+    // ];
+
+    let response = await getLast10();
+    
+    // this only takes the record IDs, but not the details
+    // make an array of record IDs
+    // go back and get all of them
+    // set up output array
+    // for each thing in record ID array, fetch the actual record, push it into the output array
+    // stringify 
+    
+    console.log(response);
+    
+    return (
+        'data:text/json;charset=utf-8,' +
+        encodeURIComponent(JSON.stringify(response.data))
+    );
 }
