@@ -1,13 +1,13 @@
 {
 	"scripts": {
-		"start": "tsc nodemon dist/main.js",
+		"start": "tsc && nodemon dist/main.js",
 		"cli": "ts-node src/cli.ts",
 		"test": "jest",
 		"lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
 		"build": "tsc -p tsconfig.json",
 		"clean": "rm -rf dist build",
 		"ts-node": "ts-node",
-		"dev": "tsc && nodemon --config nodemon.json",
+		"dev": "nodemon --config nodemon.json",
 		"dev:debug": "nodemon --config nodemon.json --inspect-brk src/main.ts",
 		"postinstall": "tsc",
 		"watch-node": "nodemon dist/main.js",

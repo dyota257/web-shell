@@ -39,7 +39,7 @@ export async function tt(commands: string): Promise<string> {
                 out = await ttStart(args);
                 break;
             case 'stop':
-                out = await ttStop();
+                out = await ttStop(args);
                 break;
             case 'note':
                 out = await ttNote(args);
@@ -105,8 +105,10 @@ function ttLog(): string {
     return 'The whole history is here';
 }
 
-async function ttStop(): Promise<string> {
+async function ttStop(args: Array<string>): Promise<string> {
     // TODO handle time argument
+
+    let time: string;
 
     const latestBinId = await getLatestBinId();
     const latestBin: Entry = await getBin(latestBinId);
@@ -116,9 +118,18 @@ async function ttStop(): Promise<string> {
             <string>latestBin.end
         )}`;
     } else {
-        latestBin.end = new Date().toISOString();
-        makeAPICall(makeAPIOptions('binsUpdate', latestBin, latestBinId));
-        return `Stopped ${latestBin.name} at ${getCurrentTime()}`;
+        if (args[0]) {
+            if (validateTimeInput(args[0])) {
+                time = setHoursAndMinutes(args[0]);
+            } else {
+                return 'This time input is invalid';
+            }
+        } else {
+            time = new Date().toISOString();
+        }
+        latestBin.end = time;
+        await updateBin(latestBin, latestBinId);
+        return `Stopped ${latestBin.name} at ${args[0] || getCurrentTime()}`;
     }
 }
 
