@@ -35,9 +35,7 @@ export const apiMethods = {
     binsRead: {
         route: (binId?: string) => `/b/${binId}`,
         method: 'GET',
-        headers: () => {
-            return {};
-        },
+        headers: () => {},
         // {
         //     "record": {
         //       "sample": "Hello World"
@@ -51,9 +49,7 @@ export const apiMethods = {
     binsUpdate: {
         route: (binId?: string) => `/b/${binId}`,
         method: 'PUT',
-        headers: () => {
-            return {};
-        },
+        headers: () => {},
         // {
         //     "record": {
         //       "sample": "Hello World"
@@ -67,9 +63,7 @@ export const apiMethods = {
     binsDelete: {
         route: (binId?: string) => `/b/${binId}`,
         method: 'DELETE',
-        headers: () => {
-            return {};
-        },
+        headers: () => {},
         // {
         //     "metadata": {
         //       "id": "<BIN_ID>",
@@ -79,12 +73,10 @@ export const apiMethods = {
         // }
     },
     collectionsBins: {
-        // fetsh the first 10 bins from the specified collection ID
+        // fetch the first 10 bins from the specified collection ID
         route: (collectionId?: string) => `/c/${collectionId}/bins`,
         method: 'GET',
-        headers: () => {
-            return {};
-        },
+        headers: () => {},
         // [
         //     {
         //         "snippetMeta": {},
@@ -175,4 +167,11 @@ export async function getLast10() {
             makeAPIOptions('collectionsBins', undefined, collectionId)
         )
     ).data;
+}
+
+export async function getRemainderBins(lastBinId: string) {
+    let options = makeAPIOptions('collectionsBins', undefined, collectionId);
+    let oldRoute = options.url;
+    options.url = oldRoute + `/${lastBinId}`;
+    return (await makeAPICall(options)).data;
 }

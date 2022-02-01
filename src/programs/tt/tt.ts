@@ -5,6 +5,7 @@ import {
     getLatestBin,
     updateBin,
     getLast10,
+    getRemainderBins
 } from './jsonbin';
 
 import { getCurrentTime } from '../../public/js/shared/functions';
@@ -227,7 +228,13 @@ export async function ttDownload(): Promise<string> {
     //     },
     // ];
 
-    let response = await getLast10();
+    let firstTen = await getLast10();
+
+    let lastBinId: string = firstTen[firstTen.length - 1].record;
+
+    let restOfRecords = await getRemainderBins(lastBinId);
+
+    const allRecords = [...firstTen, ...restOfRecords];
 
     // this only takes the record IDs, but not the details
     // make an array of record IDs
@@ -236,10 +243,10 @@ export async function ttDownload(): Promise<string> {
     // for each thing in record ID array, fetch the actual record, push it into the output array
     // stringify
 
-    console.log(response);
+    console.log({ serverResponse: firstTen });
 
     return (
         'data:text/json;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(response.data))
+        encodeURIComponent(JSON.stringify(allRecords))
     );
 }

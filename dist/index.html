@@ -91,8 +91,6 @@
                     userInput.value = '';
                     history.innerHTML += await processInput(input)
                     window.scrollTo(0,document.body.scrollHeight)
-                    
-
             }
         }
 
@@ -125,9 +123,11 @@
                 body: JSON.stringify({ command: input })
             });
 
-            console.log({response: await response.text()});
+            let responseText = await response.text()
             
-            downloadObjectAsJson(await response.text(), '.tt-sheet');
+            console.log({response: responseText});
+            
+            downloadObjectAsJson(responseText, '.tt-sheet');
         }
 
         function printToConsole(input) {
