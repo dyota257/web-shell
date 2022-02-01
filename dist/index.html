@@ -90,6 +90,8 @@
                     // clear the textbox
                     userInput.value = '';
                     history.innerHTML += await processInput(input)
+                    window.scrollTo(0,document.body.scrollHeight)
+                    
 
             }
         }
@@ -110,6 +112,7 @@
             } else {
                 return printShellResponse('Network error')
             }
+
 
         }
 
@@ -142,7 +145,7 @@
             // return void
             history.innerHTML += `<div>
                 <div>[${getCurrentTime()}]</div><br>
-                </div>`
+            </div>`
         }
 
         function clearConsole() {
