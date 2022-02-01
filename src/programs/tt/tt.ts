@@ -138,7 +138,7 @@ async function ttNote(args: Array<string>): Promise<string> {
         return `You're not working on a task. Start one to add a note to it.`;
     } else {
         // add note
-        const newNote = args.join(' ') || '';
+        const newNote = getCurrentTime() + args.join(' ') || '';
 
         if (args.length === 0 || newNote.length === 0) {
             console.log(newNote.length);
@@ -149,9 +149,7 @@ async function ttNote(args: Array<string>): Promise<string> {
             await updateBin(newBin, latestBinId);
 
             // respond to user
-            return `Note added to ${
-                latestBin.name
-            }: '${getCurrentTime()} ${newNote}'`;
+            return `Note added to ${latestBin.name}: '${newNote}'`;
         }
     }
 }
@@ -230,16 +228,16 @@ export async function ttDownload(): Promise<string> {
     // ];
 
     let response = await getLast10();
-    
+
     // this only takes the record IDs, but not the details
     // make an array of record IDs
     // go back and get all of them
     // set up output array
     // for each thing in record ID array, fetch the actual record, push it into the output array
-    // stringify 
-    
+    // stringify
+
     console.log(response);
-    
+
     return (
         'data:text/json;charset=utf-8,' +
         encodeURIComponent(JSON.stringify(response.data))
